@@ -157,6 +157,20 @@ h2 {
   gap: 16px;
 }
 
+.game-grid.mat-mode {
+  grid-template-columns: 1fr 1fr;
+}
+
+.mat-span {
+  grid-column: 1 / -1;
+  margin-top: 4px;
+}
+
+.mat-span .panel {
+  border-color: var(--green-dark);
+  background: #f6faf0;
+}
+
 .panel,
 .app-panel {
   border: 2px solid var(--ink);
@@ -279,7 +293,7 @@ form,
 }
 
 .slot {
-  flex: 1 0 110px;
+  flex: 1 0 128px;
   min-width: 0;
   display: flex;
   flex-direction: column;
@@ -287,8 +301,9 @@ form,
   gap: 4px;
   border: 2px solid var(--line);
   border-radius: 8px;
-  padding: 10px 8px;
+  padding: 14px 10px;
   background: white;
+  color: var(--ink);
   cursor: pointer;
   position: relative;
   transition: transform 0.1s, box-shadow 0.1s;
@@ -296,6 +311,15 @@ form,
 
 .slot:active:not(.empty) {
   transform: scale(0.97);
+}
+
+@keyframes winner-pulse {
+  0%, 100% {
+    box-shadow: inset 0 0 0 2px var(--green), 0 0 8px rgba(20, 107, 77, 0.3);
+  }
+  50% {
+    box-shadow: inset 0 0 0 2px var(--green), 0 0 24px rgba(20, 107, 77, 0.6), 0 0 48px rgba(20, 107, 77, 0.15);
+  }
 }
 
 .slot-all-high {
@@ -329,6 +353,16 @@ form,
   box-shadow: inset 0 0 0 2px var(--blue), 0 0 0 2px var(--blue);
 }
 
+.slot.drag-over {
+  border-color: var(--blue);
+  box-shadow: 0 0 0 2px var(--blue), 0 0 12px rgba(37, 95, 133, 0.35);
+  transform: scale(1.04);
+}
+
+.chip-selector.dragging {
+  opacity: 0.4;
+}
+
 .slot-has-bet {
   border-color: var(--gold);
   box-shadow: 0 0 0 2px var(--gold);
@@ -337,31 +371,49 @@ form,
 .slot.winner {
   border-color: var(--green);
   background: #e2f6d7;
-  box-shadow: inset 0 0 0 2px var(--green), 0 0 0 4px rgba(20, 107, 77, 0.25);
+  animation: winner-pulse 1.2s ease-in-out infinite;
+}
+
+.answer-reveal {
+  margin-top: 8px;
+  padding: 12px 16px;
+  border-radius: 8px;
+  background: var(--green);
+  color: white;
+  font-size: 1.3rem;
+  font-weight: 800;
+  text-align: center;
+}
+
+.answer-reveal strong {
+  display: block;
+  font-size: 2rem;
+  margin-top: 4px;
 }
 
 .slot .odds {
   display: inline-block;
   border-radius: 999px;
-  padding: 0.2rem 0.4rem;
+  padding: 0.25rem 0.55rem;
   color: white;
   background: var(--red);
-  font-size: 0.72rem;
+  font-size: 0.82rem;
   font-weight: 900;
   line-height: 1;
 }
 
 .slot .guess-value {
   display: block;
-  font-size: 1.25rem;
+  font-size: 1.5rem;
   font-weight: 700;
   line-height: 1.15;
+  color: var(--ink);
   text-align: center;
   word-break: break-word;
 }
 
 .slot .slot-guessers {
-  font-size: 0.68rem;
+  font-size: 0.72rem;
   color: var(--muted);
   text-align: center;
   line-height: 1.2;
@@ -507,11 +559,61 @@ form,
   line-height: 1;
 }
 
-.bet-indicator {
-  margin-top: 3px;
-  font-size: 0.68rem;
-  color: var(--blue);
+.slot-bettors {
+  display: block;
+  font-size: 0.7rem;
+  color: var(--ink);
+  text-align: center;
+  line-height: 1.3;
+  margin-top: 2px;
+  border-top: 1px solid var(--line);
+  padding-top: 3px;
+  width: 100%;
+}
+
+/* === Chip economy visuals === */
+
+.chip-piece {
+  display: inline-block;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 2px solid;
+  vertical-align: middle;
+  flex-shrink: 0;
+}
+
+.chip-piece.red {
+  background: #c0392b;
+  border-color: #922b21;
+}
+
+.chip-piece.blue {
+  background: #2980b9;
+  border-color: #1a5276;
+}
+
+.chip-piece.green {
+  background: #27ae60;
+  border-color: #1a7a42;
+}
+
+.chip-piece.gold {
+  background: radial-gradient(circle at 35% 35%, #f5d78e, #c9a432);
+  border-color: #a88528;
+}
+
+.chip-stack-visual {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
   font-weight: 700;
+  font-size: 0.85rem;
+}
+
+.chip-stack-visual .count {
+  font-weight: 700;
+  font-size: 0.85rem;
 }
 
 @media (max-width: 760px) {
@@ -523,6 +625,7 @@ form,
 
   .home-grid,
   .game-grid,
+  .game-grid.mat-mode,
   .settings-grid,
   .bet-grid {
     grid-template-columns: 1fr;
@@ -538,17 +641,17 @@ form,
   }
 
   .slot {
-    flex: 1 0 90px;
-    min-width: 90px;
-    padding: 8px 6px;
+    flex: 1 0 100px;
+    min-width: 100px;
+    padding: 10px 6px;
   }
 
   .slot .guess-value {
-    font-size: 1rem;
+    font-size: 1.15rem;
   }
 
   .slot .odds {
-    font-size: 0.65rem;
-    padding: 0.15rem 0.35rem;
+    font-size: 0.72rem;
+    padding: 0.2rem 0.4rem;
   }
 }

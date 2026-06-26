@@ -152,20 +152,40 @@ function renderLobby(state, isHost) {
 }
 
 function renderGame(state, you, isHost) {
+  const isMatState = ["BETTING", "REVEAL"].includes(state.state);
+
+  if (isMatState) {
+    return `
+      <div class="game-grid mat-mode">
+        <section class="stack">
+          ${renderQuestion(state)}
+        </section>
+        <section class="stack">
+          ${renderPlayers(state)}
+          ${renderLeaderboard(state)}
+          ${isHost && state.state === "BETTING" ? `<button class="secondary" id="skip-timer">Skip timer</button>` : ""}
+          ${isHost && state.state !== "GAME_OVER" ? `<button class="danger" id="end-game">End game</button>` : ""}
+        </section>
+        <div class="mat-span">
+          ${state.state === "BETTING" ? renderBetting(state, you) : ""}
+          ${state.state === "REVEAL" ? renderReveal(state, isHost) : ""}
+        </div>
+      </div>
+    `;
+  }
+
   return `
     <div class="game-grid">
       <section class="stack">
         ${renderQuestion(state)}
         ${state.state === "QUESTION" ? `<div class="panel"><h3>Get Ready</h3><p class="muted">The question is coming onto the mat.</p></div>` : ""}
         ${state.state === "GUESSING" ? renderGuessForm(you) : ""}
-        ${state.state === "BETTING" ? renderBetting(state, you) : ""}
-        ${state.state === "REVEAL" ? renderReveal(state, isHost) : ""}
         ${state.state === "SCORE" || state.state === "GAME_OVER" ? renderScoreActions(state, isHost) : ""}
       </section>
       <section class="stack">
         ${renderPlayers(state)}
         ${renderLeaderboard(state)}
-        ${isHost && ["QUESTION", "GUESSING", "BETTING"].includes(state.state) ? `<button class="secondary" id="skip-timer">Skip timer</button>` : ""}
+        ${isHost && ["QUESTION", "GUESSING"].includes(state.state) ? `<button class="secondary" id="skip-timer">Skip timer</button>` : ""}
         ${isHost && state.state !== "GAME_OVER" ? `<button class="danger" id="end-game">End game</button>` : ""}
       </section>
     </div>
@@ -175,6 +195,8 @@ function renderGame(state, you, isHost) {
 function renderQuestion(state) {
   const question = state.currentQuestion;
   if (!question) return "";
+  const showAnswer = question.answer !== null;
+  const isReveal = state.state === "REVEAL";
   return `
     <div class="question-card">
       <div class="meta-row">
@@ -182,7 +204,11 @@ function renderQuestion(state) {
         <span class="tag">${question.difficulty}</span>
       </div>
       <h2>${escapeHtml(question.text)}</h2>
-      ${question.answer !== null ? `<p><strong>Answer:</strong> ${formatNumber(question.answer)} ${escapeHtml(question.unit || "")}</p>` : `<p class="muted">Answer with a positive number.</p>`}
+      ${showAnswer ? `
+        <div class="${isReveal ? "answer-reveal" : ""}">
+          ${isReveal ? "Correct answer" : "Answer"}: <strong>${formatNumber(question.answer)}</strong> ${escapeHtml(question.unit || "")}
+        </div>
+      ` : `<p class="muted">Answer with a positive number.</p>`}
     </div>
   `;
 }
@@ -234,8 +260,6 @@ function renderSlot(slot, state, interactive) {
   const isEmpty = slot.guessValue === null;
   const isCenter = slot.index === 4;
   const myBetIndices = getMyBetIndices(slot.index);
-  const otherBets = visibleBetsForSlot(state, slot.index).filter(b => b.playerId !== session.playerId);
-  const allBets = visibleBetsForSlot(state, slot.index);
 
   let classes = "slot";
   if (isAllHigh) classes += " slot-all-high";
@@ -257,7 +281,7 @@ function renderSlot(slot, state, interactive) {
       ${interactive && myBetIndices.length > 0 ? `
         <span class="my-bets">${myBetIndices.map(i => `<span class="chip-marker">${i + 1}</span>`).join("")}</span>
       ` : ""}
-      ${!interactive && allBets.length > 0 ? `<span class="bet-indicator">${allBets.length} bet${allBets.length > 1 ? "s" : ""}</span>` : ""}
+      ${renderBettors(slot, state, interactive)}
     </button>
   `;
 }
@@ -270,7 +294,7 @@ function renderChipTray() {
       const placed = bet.slotIndex !== null;
       const slot = placed ? state.matSlots.find(s => s.index === bet.slotIndex) : null;
       return `<div class="chip-selector-group">
-        <button type="button" class="chip-selector ${session.selectedWagerIndex === i ? "active" : ""}" data-wager="${i}">
+        <button type="button" class="chip-selector ${session.selectedWagerIndex === i ? "active" : ""}" data-wager="${i}" draggable="true">
           <span class="chip-icon"></span>
           <span>Wager ${i + 1}</span>
           <span class="chip-location">${placed ? "\u2192 " + slotLabel(slot) : '<span class="muted">slot</span>'}</span>
@@ -286,6 +310,32 @@ function renderChipTray() {
       </div>`;
     }).join("")}
   </div>`;
+}
+
+function renderBettors(slot, state, interactive) {
+  const bets = visibleBetsForSlot(state, slot.index);
+  const byPlayer = {};
+
+  for (const bet of bets) {
+    const player = state.players.find(p => p.id === bet.playerId);
+    const name = player?.name || "Unknown";
+    byPlayer[name] = (byPlayer[name] || 0) + (Number(bet.pokerChipsStacked) || 0);
+  }
+
+  const me = state.players.find(p => p.isYou);
+  if (interactive && me && !me.hasBet) {
+    for (const sb of session.bets) {
+      if (sb.slotIndex === slot.index) {
+        byPlayer[me.name] = (byPlayer[me.name] || 0) + (sb.pokerChipsStacked || 0);
+      }
+    }
+  }
+
+  const entries = Object.entries(byPlayer);
+  if (entries.length === 0) return "";
+  return `<span class="slot-bettors">${entries
+    .map(([name, chips]) => chips > 0 ? `${escapeHtml(name)} \u00b7 ${chips}` : escapeHtml(name))
+    .join("<br>")}</span>`;
 }
 
 function getMyBetIndices(slotIndex) {
@@ -334,6 +384,11 @@ function renderPlayers(state) {
   `;
 }
 
+function renderChips(count) {
+  const dim = count === 0 ? " style=\"opacity:0.35\"" : "";
+  return `<span class="chip-stack-visual"${dim}><span class="chip-piece gold"></span><span class="count">${count}</span></span>`;
+}
+
 function renderLeaderboard(state) {
   return `
     <section class="panel">
@@ -342,7 +397,7 @@ function renderLeaderboard(state) {
         ${state.leaderboard.map((player) => `
           <div class="rank-row">
             <span>${player.rank}. <strong>${escapeHtml(player.name)}</strong>${player.isYou ? " · You" : ""}</span>
-            <span class="chip-row"><span class="chip">2 wager</span><span class="chip gold">${player.pokerChips} poker</span></span>
+            <span class="chip-row">${renderChips(player.pokerChips)}</span>
           </div>
         `).join("")}
       </div>
@@ -377,11 +432,42 @@ function bindActions(state, you, isHost) {
     });
   });
 
+  document.querySelectorAll("[data-wager]").forEach(btn => {
+    btn.addEventListener("dragstart", e => {
+      e.dataTransfer.setData("text/plain", btn.dataset.wager);
+      e.dataTransfer.effectAllowed = "move";
+      btn.classList.add("dragging");
+    });
+    btn.addEventListener("dragend", () => {
+      btn.classList.remove("dragging");
+      document.querySelectorAll(".slot.drag-over").forEach(s => s.classList.remove("drag-over"));
+    });
+  });
+
   document.querySelectorAll("[data-slot]:not([disabled])").forEach(btn => {
     btn.addEventListener("click", () => {
       const slotIndex = Number(btn.dataset.slot);
       const idx = session.selectedWagerIndex;
       session.bets[idx].slotIndex = slotIndex;
+      const nextUnplaced = session.bets.findIndex(b => b.slotIndex === null);
+      if (nextUnplaced !== -1) session.selectedWagerIndex = nextUnplaced;
+      render();
+    });
+    btn.addEventListener("dragover", e => {
+      e.preventDefault();
+      e.dataTransfer.dropEffect = "move";
+      btn.classList.add("drag-over");
+    });
+    btn.addEventListener("dragleave", () => {
+      btn.classList.remove("drag-over");
+    });
+    btn.addEventListener("drop", e => {
+      e.preventDefault();
+      btn.classList.remove("drag-over");
+      const wagerIndex = Number(e.dataTransfer.getData("text/plain"));
+      const slotIndex = Number(btn.dataset.slot);
+      session.selectedWagerIndex = wagerIndex;
+      session.bets[wagerIndex].slotIndex = slotIndex;
       const nextUnplaced = session.bets.findIndex(b => b.slotIndex === null);
       if (nextUnplaced !== -1) session.selectedWagerIndex = nextUnplaced;
       render();
