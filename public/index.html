@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Wits & Wagers</title>
+    <link rel="stylesheet" href="/styles.css">
+  </head>
+  <body>
+    <main class="shell">
+      <section class="masthead">
+        <div>
+          <p class="eyebrow">Live trivia betting</p>
+          <h1>Wits & Wagers</h1>
+        </div>
+        <div class="room-pill" id="room-pill" hidden></div>
+      </section>
+
+      <section id="notice" class="notice" hidden></section>
+      <section id="app" class="app-panel"></section>
+    </main>
+
+    <template id="home-template">
+      <div class="home-grid">
+        <form class="panel" id="create-form">
+          <h2>Create Room</h2>
+          <label>
+            Display name
+            <input name="name" autocomplete="name" maxlength="24" required placeholder="Host name">
+          </label>
+          <div class="settings-grid">
+            <label>
+              Rounds
+              <input name="totalRounds" type="number" min="1" max="15" value="7">
+            </label>
+            <label>
+              Guess timer
+              <input name="guessingTimerSeconds" type="number" min="10" max="180" value="30">
+            </label>
+            <label>
+              Bet timer
+              <input name="bettingTimerSeconds" type="number" min="10" max="180" value="30">
+            </label>
+          </div>
+          <button type="submit">Create room</button>
+        </form>
+
+        <form class="panel accent" id="join-form">
+          <h2>Join Room</h2>
+          <label>
+            Room code
+            <input name="roomCode" autocomplete="off" maxlength="6" required placeholder="WZ49KQ">
+          </label>
+          <label>
+            Display name
+            <input name="name" autocomplete="name" maxlength="24" required placeholder="Player name">
+          </label>
+          <button type="submit">Join room</button>
+        </form>
+      </div>
+    </template>
+  </body>
+  <script src="/app.js" type="module"></script>
+</html>

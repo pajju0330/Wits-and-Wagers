@@ -1,0 +1,137 @@
+[
+  {
+    "id": "q_001",
+    "text": "How many home runs did Babe Ruth hit in his Major League Baseball career?",
+    "answer": 714,
+    "unit": "home runs",
+    "source": "Baseball Reference",
+    "category": "Sports",
+    "difficulty": "easy"
+  },
+  {
+    "id": "q_002",
+    "text": "How many bones are in the average adult human body?",
+    "answer": 206,
+    "unit": "bones",
+    "source": "Encyclopaedia Britannica",
+    "category": "Science",
+    "difficulty": "easy"
+  },
+  {
+    "id": "q_003",
+    "text": "What is the height of Mount Everest above sea level?",
+    "answer": 8848.86,
+    "unit": "meters",
+    "source": "Government of Nepal and China joint survey",
+    "category": "Geography",
+    "difficulty": "medium"
+  },
+  {
+    "id": "q_004",
+    "text": "In what year was the first iPhone released?",
+    "answer": 2007,
+    "unit": "year",
+    "source": "Apple",
+    "category": "Technology",
+    "difficulty": "easy"
+  },
+  {
+    "id": "q_005",
+    "text": "How many kilometers long is the Nile River, approximately?",
+    "answer": 6650,
+    "unit": "kilometers",
+    "source": "Encyclopaedia Britannica",
+    "category": "Geography",
+    "difficulty": "medium"
+  },
+  {
+    "id": "q_006",
+    "text": "How many elements are currently on the periodic table?",
+    "answer": 118,
+    "unit": "elements",
+    "source": "IUPAC",
+    "category": "Science",
+    "difficulty": "easy"
+  },
+  {
+    "id": "q_007",
+    "text": "How many Academy Awards did the movie Titanic win?",
+    "answer": 11,
+    "unit": "Oscars",
+    "source": "Academy Awards",
+    "category": "Movies",
+    "difficulty": "easy"
+  },
+  {
+    "id": "q_008",
+    "text": "What is the average distance from Earth to the Moon?",
+    "answer": 384400,
+    "unit": "kilometers",
+    "source": "NASA",
+    "category": "Space",
+    "difficulty": "medium"
+  },
+  {
+    "id": "q_009",
+    "text": "How many keys are on a standard modern piano?",
+    "answer": 88,
+    "unit": "keys",
+    "source": "Steinway",
+    "category": "Music",
+    "difficulty": "easy"
+  },
+  {
+    "id": "q_010",
+    "text": "How many countries are members of the United Nations?",
+    "answer": 193,
+    "unit": "countries",
+    "source": "United Nations",
+    "category": "World",
+    "difficulty": "medium"
+  },
+  {
+    "id": "q_011",
+    "text": "What is the maximum break in a standard frame of snooker?",
+    "answer": 147,
+    "unit": "points",
+    "source": "World Snooker Tour",
+    "category": "Sports",
+    "difficulty": "medium"
+  },
+  {
+    "id": "q_012",
+    "text": "How many minutes long is the theatrical release of The Lord of the Rings: The Fellowship of the Ring?",
+    "answer": 178,
+    "unit": "minutes",
+    "source": "New Line Cinema",
+    "category": "Movies",
+    "difficulty": "hard"
+  },
+  {
+    "id": "q_013",
+    "text": "How many squares are on a standard chessboard?",
+    "answer": 64,
+    "unit": "squares",
+    "source": "FIDE",
+    "category": "Games",
+    "difficulty": "easy"
+  },
+  {
+    "id": "q_014",
+    "text": "How many meters is an Olympic swimming pool?",
+    "answer": 50,
+    "unit": "meters",
+    "source": "World Aquatics",
+    "category": "Sports",
+    "difficulty": "easy"
+  },
+  {
+    "id": "q_015",
+    "text": "How many novels did Jane Austen complete?",
+    "answer": 6,
+    "unit": "novels",
+    "source": "Jane Austen's House",
+    "category": "Literature",
+    "difficulty": "medium"
+  }
+]
