@@ -581,8 +581,8 @@ function handleEvents(request, response, url) {
 }
 
 async function serveStatic(response, pathname) {
-  const requested = pathname === "/" || pathname.startsWith("/room/") ? "/index.html" : pathname;
-  const normalized = normalize(requested).replace(/^(\.\.[/\\])+/, "");
+  const hasExt = extname(pathname);
+  const normalized = normalize(pathname === "/" || !hasExt ? "/index.html" : pathname).replace(/^(\.\.[/\\])+/, "");
   const filePath = join(publicDir, normalized);
   if (!filePath.startsWith(publicDir)) {
     response.writeHead(403);
@@ -594,8 +594,13 @@ async function serveStatic(response, pathname) {
     response.writeHead(200, { "content-type": mimeTypes[extname(filePath)] || "application/octet-stream" });
     response.end(content);
   } catch {
-    response.writeHead(404, { "content-type": "text/plain; charset=utf-8" });
-    response.end("Not found");
+    if (hasExt) {
+      response.writeHead(404, { "content-type": "text/plain; charset=utf-8" });
+      response.end("Not found");
+    } else {
+      response.writeHead(200, { "content-type": "text/html; charset=utf-8" });
+      response.end(await readFile(join(publicDir, "index.html")));
+    }
   }
 }
 
